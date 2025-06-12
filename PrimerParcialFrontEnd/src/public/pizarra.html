@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Visual Front-End</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+  <div id="loading-indicator" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Cargando sala...</p>
+  </div>
+  <div class="container">
+    <!-- Panel izquierdo: Controles -->
+    <div class="panel left">
+      <h2>Menú</h2>
+      <button id="btnNuevaVista">Nueva Vista</button>
+      <button id="btnAñadirComponente">Añadir Componente</button>
+      <hr class="menu-divider">
+      <button id="btnAñadirImagenLienzo">Añadir Imagen al Lienzo</button>
+      <input type="file" id="inputAñadirImagenLienzo" accept="image/*" style="display: none;" />
+      <hr class="menu-divider">
+      <div class="chat-en-panel">
+        <h3>Chat de Ayuda</h3>
+        <div class="chat-messages-container-panel" id="chatMessagesPanel">
+          <div class="chat-message-panel received">
+            <span class="chat-user-panel">Asistente:</span>
+            <p>¡Hola! ¿En qué puedo ayudarte hoy con el editor?</p>
+            <span class="chat-timestamp-panel">10:30 AM</span>
+          </div>
+        </div>
+        <div class="chat-input-container-panel">
+          <input type="text" id="chatInputPanel" placeholder="Escribe tu mensaje..." />
+          <button id="chatSendButtonPanel">Enviar</button>
+        </div>
+      </div>
+      <hr class="menu-divider">
+      <button id="btnExportarJSON">Exportar JSON</button>
+      <button id="btnImportarJSON">Importar JSON</button>
+      <input type="file" id="inputImportarJSON" accept="application/json" style="display: none;" />
+      <!-- NUEVO -->
+      <button id="btnExportarMovil">Exportar Móvil</button> 
+      <hr class="menu-divider">
+      <button id="btnReset">Resetear</button>
+    </div>
+    <!-- Panel central: Canvas -->
+    <div class="panel center">
+      <div class="canvas-box" id="canvasBox"></div>
+      <div class="zona-inferior" id="zonaInferior"></div>
+    </div>
+    <!-- Panel derecho: Propiedades -->
+    <div class="panel right" id="propiedadesPanel">
+      <h3>Propiedades</h3>
+      <div id="panelContenido"></div>
+    </div>
+  </div>
+  <form id="componentForm" class="component-form hidden">
+    <label for="tipoComponente">Seleccionar componente:</label>
+    <select name="tipo" id="tipoComponente">
+      <option value="input">Input</option>
+      <option value="button">Button</option>
+      <option value="label">Label</option>
+      <option value="textarea">Textarea</option>
+      <option value="select">ComboBox</option>
+      <option value="checklist">Checklist</option>
+      <option value="checkbox">Checkbox</option>
+      <option value="radiogroup">Radio Group</option>
+      <option value="tabla">Tabla</option>
+      <option value="clock">Reloj</option>
+      <option value="image">Imagen</option>
+    </select>
+    <button type="submit">Agregar</button>
+  </form>
+  <script type="module" src="./js/main.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai",
+        "https://cdn.socket.io/4.7.4/socket.io.esm.min.js": "https://cdn.socket.io/4.7.4/socket.io.esm.min.js"
+      }
+    }
+  </script>
+</body>
+</html>
+</body>
+</html>

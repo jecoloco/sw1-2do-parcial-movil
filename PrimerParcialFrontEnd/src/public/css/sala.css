@@ -1,0 +1,53 @@
+        #rooms-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #rooms-table th,
+        #rooms-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+        }
+
+        #rooms-table th {
+            background-color: #26a69a;
+            color: white;
+        }
+
+        #rooms-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #rooms-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #rooms-table td {
+            color: #fff;
+        }
+
+        #rooms-table th,
+        #rooms-table td {
+            border-radius: 5px;
+        }
+
+        .action-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .edit-button {
+            background-color: #ffa500;
+            color: white;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }

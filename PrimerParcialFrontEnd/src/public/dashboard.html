@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/sala.css">
+    <style>
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #invite-form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            position: relative;
+        }
+
+        .blur {
+            filter: blur(4px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">Maquetador</div>
+            <ul class="nav-links">
+                <li><a href="#home">Inicio</a></li>
+                <li><button id="logout-button">Cerrar Sesión</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="overlay">
+        <div id="invite-form-container" style="display: none;">
+            <h3>Invitar Usuario</h3>
+            <label for="user-select">Seleccionar Usuario:</label>
+            <select id="user-select"></select>
+            <button id="save-invitation-button">Guardar</button>
+            <button id="cancel-invitation-button">Cancelar</button>
+        </div>
+    </div>
+    
+    <main id="main-content">
+        <div class="content-wrapper">
+            <section id="profile" class="content-card">
+                <h1>Bienvenido al Dashboard</h1>
+                <p id="user-info">Cargando datos del usuario...</p>
+            </section>
+            <div class="button-container">
+                <button id="created-rooms-button" class="btn created-button" onclick="location.href='dashboard.html'">Salas Creadas</button>
+                <button id="view-shared-rooms-button" class="btn shared-button">Ver Salas Compartidas</button>
+                <button id="create-room-button" class="btn create-button" onclick="location.href='crearSala.html'">Crear Nueva Sala</button>
+            </div>
+            <section id="rooms" class="content-card">
+                <h2>Salas Asociadas</h2>
+                <table id="rooms-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rooms-body">
+                        <tr>
+                            <td colspan="4">Cargando salas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <video id="video" src="/video.mp4" style="display:none;" controls></video>
+
+    <script src="./js/config.js"></script> 
+    <script src="./js/app.js"></script>
+    <script src="./js/dashboard.js"></script>
+    <script>
+        async function editRoom(id) {
+            window.location.href = 'editarSala.html?id=' + id;
+        }
+    
+        async function deleteRoom(id) {
+            if (confirm(`¿Estás seguro de que deseas eliminar la sala con ID: ${id}?`)) {
+                try {
+                    const response = await fetch(`${API_URL}/apis/sala/${id}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                    });
+                    if (response.ok) {
+                        alert(`Sala con ID: ${id} eliminada.`);
+                        window.location.href = './dashboard.html'; 
+                    } else {
+                        alert(`Error al eliminar la sala: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    alert(`Error de red: ${error.message}`);
+                }
+            }
+        }
+    
+        function inviteToRoom(roomId) {
+            document.getElementById('overlay').style.display = 'flex'; 
+            document.getElementById('invite-form-container').style.display = 'block'; 
+            document.getElementById('main-content').classList.add('blur'); 
+    
+            fetch(`${API_URL}/apis/notEmail`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(handleResponse)
+            .then(data => {
+                const userSelect = document.getElementById('user-select');
+                userSelect.innerHTML = '';
+                data.data.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name;
+                    userSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar usuarios:', error);
+            });    
+            document.getElementById('save-invitation-button').onclick = function() {
+                const userId = document.getElementById('user-select').value;
+                saveInvitation(roomId, userId);
+            };
+            document.getElementById('cancel-invitation-button').onclick = function() {
+                document.getElementById('overlay').style.display = 'none'; 
+                document.getElementById('invite-form-container').style.display = 'none'; 
+                document.getElementById('main-content').classList.remove('blur');
+            };
+        }
+    
+        async function saveInvitation(salas_id, userId) {
+            try {
+                const response = await fetch(`${API_URL}/apis/usersala/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ salas_id, userId }),
+                });
+                if (response.ok) {
+                    alert('Invitación guardada exitosamente.');
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('invite-form-container').style.display = 'none';
+                    document.getElementById('main-content').classList.remove('blur');
+                } else {
+                    alert(`Error al guardar la invitación: ${response.statusText}`);
+                }
+            } catch (error) {
+                alert(`Error de red: ${error.message}`);
+            }
+        }
+    </script>    
+</body>
+</html>

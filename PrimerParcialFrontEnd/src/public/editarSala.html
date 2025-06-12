@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Sala</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">Editar Sala</div>
+            <ul class="nav-links">
+                <li><a href="./dashboard.html">Volver al Dashboard</a></li>
+                <li><button id="logout-button">Cerrar Sesión</button></li>
+            </ul>
+        </div>
+    </nav>
+    <main id="main-content">
+        <div class="content-wrapper">
+            <h1>Formulario para Editar Sala</h1>
+            <form id="edit-room-form">
+                <input type="hidden" id="room-id" />
+                <div>
+                    <label for="title">Título:</label>
+                    <input type="text" id="title" name="title" required />
+                </div>
+                <div>
+                    <label for="xml">XML:</label>
+                    <textarea id="xml" name="xml" rows="5" required></textarea>
+                </div>
+                <div>
+                    <label for="description">Descripción:</label>
+                    <textarea id="description" name="description" rows="5" required></textarea>
+                </div>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </main>    
+    <video id="video" src="/video.mp4" style="display:none;" controls></video>
+    <script src="./js/config.js"></script> 
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        async function loadRoomData() {
+            const roomId = getQueryParam('id');
+            if (roomId) {
+                try {
+                    const response = await fetch(`${API_URL}/apis/sala/${roomId}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.error === false && data.data.length > 0) {
+                        const room = data.data[0];
+                        document.getElementById('room-id').value = room.id;
+                        document.getElementById('title').value = room.title;
+                        document.getElementById('xml').value = room.xml;
+                        document.getElementById('description').value = room.description;
+                    } else {
+                        alert('Error al cargar los datos de la sala.');
+                    }
+                } catch (error) {
+                    alert(`Error de red: ${error.message}`);
+                }
+            } else {
+                alert('No se encontró el ID de la sala.');
+            }
+        }
+
+        async function handleEditRoom(event) {
+            event.preventDefault();
+            const id = document.getElementById('room-id').value;
+            const title = document.getElementById('title').value;
+            const xml = document.getElementById('xml').value;
+            const description = document.getElementById('description').value;
+            try {
+                const response = await fetch(`${API_URL}/apis/sala/${id}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        xml: xml,
+                        description: description,
+                    }),
+                });
+
+                if (response.ok) {
+                    alert(`Sala con ID: ${id} actualizada.`);
+                    window.location.href = './dashboard.html';
+                } else {
+                    alert(`Error al actualizar la sala: ${response.statusText}`);
+                }
+            } catch (error) {
+                alert(`Error de red: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoomData();
+            document.getElementById('edit-room-form').addEventListener('submit', handleEditRoom);
+        });
+    </script>
+</body>
+</html>
